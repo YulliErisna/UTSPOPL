@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 
+// ================== CONTAINER ==================
 export default function MemberModal({ show, onHide, onSave, member, categories }) {
   const [formData, setFormData] = useState({
     name: '',
@@ -49,9 +50,7 @@ export default function MemberModal({ show, onHide, onSave, member, categories }
 
       const response = await fetch(url, {
         method,
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       })
 
@@ -71,8 +70,25 @@ export default function MemberModal({ show, onHide, onSave, member, categories }
     }
   }
 
+  // 🚨 Kalau modal tidak ditampilkan, langsung return null
   if (!show) return null
 
+  // Container hanya passing props ke Presenter
+  return (
+    <MemberModalPresenter
+      formData={formData}
+      loading={loading}
+      categories={categories}
+      onHide={onHide}
+      onChange={handleChange}
+      onSubmit={handleSubmit}
+      member={member}
+    />
+  )
+}
+
+// ================== PRESENTER ==================
+function MemberModalPresenter({ formData, loading, categories, onHide, onChange, onSubmit, member }) {
   return (
     <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
       <div className="modal-dialog modal-lg">
@@ -84,7 +100,7 @@ export default function MemberModal({ show, onHide, onSave, member, categories }
             </h5>
             <button type="button" className="btn-close" onClick={onHide}></button>
           </div>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={onSubmit}>
             <div className="modal-body">
               <div className="row">
                 <div className="col-md-6 mb-3">
@@ -95,7 +111,7 @@ export default function MemberModal({ show, onHide, onSave, member, categories }
                     id="name" 
                     name="name" 
                     value={formData.name}
-                    onChange={handleChange}
+                    onChange={onChange}
                     required 
                   />
                 </div>
@@ -107,7 +123,7 @@ export default function MemberModal({ show, onHide, onSave, member, categories }
                     id="email" 
                     name="email" 
                     value={formData.email}
-                    onChange={handleChange}
+                    onChange={onChange}
                     required 
                   />
                 </div>
@@ -121,7 +137,7 @@ export default function MemberModal({ show, onHide, onSave, member, categories }
                     id="phone" 
                     name="phone" 
                     value={formData.phone}
-                    onChange={handleChange}
+                    onChange={onChange}
                   />
                 </div>
                 <div className="col-md-6 mb-3">
@@ -131,7 +147,7 @@ export default function MemberModal({ show, onHide, onSave, member, categories }
                     id="category_id" 
                     name="category_id" 
                     value={formData.category_id}
-                    onChange={handleChange}
+                    onChange={onChange}
                     required
                   >
                     <option value="">Select Category</option>
@@ -151,7 +167,7 @@ export default function MemberModal({ show, onHide, onSave, member, categories }
                   name="address" 
                   rows="3"
                   value={formData.address}
-                  onChange={handleChange}
+                  onChange={onChange}
                 ></textarea>
               </div>
             </div>
