@@ -1,6 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+ feat_members-ui/30-09-2025
+import MemberModal from '../../components/MemberModal'
+
+export default function Members() {
+  const [members, setMembers] = useState([])
+
  feat_reports-ui/30-09-2025
 
 export default function Reports() {
@@ -68,12 +74,23 @@ export default function Reports() {
 import CategoryModal from '../../components/CategoryModal'
 
 export default function Categories() {
+ main
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(0)
   const [showModal, setShowModal] = useState(false)
+ feat_members-ui/30-09-2025
+  const [editingMember, setEditingMember] = useState(null)
+
+  useEffect(() => {
+    fetchMembers()
+    fetchCategories()
+  }, [currentPage, search])
+
+  const fetchMembers = async () => {
+
   const [editingCategory, setEditingCategory] = useState(null)
 
   useEffect(() => {
@@ -81,11 +98,43 @@ export default function Categories() {
   }, [currentPage, search])
 
   const fetchCategories = async () => {
+ main
     try {
       const params = new URLSearchParams({
         page: currentPage,
         search: search
       })
+ feat_members-ui/30-09-2025
+      const response = await fetch(`/api/members?${params}`)
+      const data = await response.json()
+      setMembers(data.members || [])
+      setTotalPages(data.totalPages || 0)
+    } catch (error) {
+      console.error('Error fetching members:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/categories')
+      const data = await response.json()
+      setCategories(data.categories || [])
+    } catch (error) {
+      console.error('Error fetching categories:', error)
+    }
+  }
+
+  const handleSearch = (e) => {
+    e.preventDefault()
+    setCurrentPage(1)
+    fetchMembers()
+  }
+
+  const handleEdit = (member) => {
+    setEditingMember(member)
+
       const response = await fetch(`/api/categories?${params}`)
       const data = await response.json()
       setCategories(data.categories || [])
@@ -145,18 +194,35 @@ export default function Dashboard() {
 
   const handleEdit = (category) => {
     setEditingCategory(category)
+ main
     setShowModal(true)
   }
 
   const handleDelete = async (id, name) => {
+ feat_members-ui/30-09-2025
+    if (confirm(`Are you sure you want to delete member "${name}"?`)) {
+      try {
+        const response = await fetch(`/api/members/${id}`, {
+
     if (confirm(`Are you sure you want to delete category "${name}"?`)) {
       try {
         const response = await fetch(`/api/categories/${id}`, {
+ main
           method: 'DELETE'
         })
         const data = await response.json()
         
         if (data.success) {
+ feat_members-ui/30-09-2025
+          alert('Member deleted successfully')
+          fetchMembers()
+        } else {
+          alert('Error deleting member')
+        }
+      } catch (error) {
+        console.error('Error deleting member:', error)
+        alert('Error deleting member')
+
           alert('Category deleted successfully')
           fetchCategories()
         } else {
@@ -165,12 +231,21 @@ export default function Dashboard() {
       } catch (error) {
         console.error('Error deleting category:', error)
         alert('Error deleting category')
+ main
       }
     }
   }
 
   const handleModalClose = () => {
     setShowModal(false)
+ feat_members-ui/30-09-2025
+    setEditingMember(null)
+  }
+
+  const handleMemberSave = () => {
+    fetchMembers()
+    handleModalClose()
+
     setEditingCategory(null)
   }
 
@@ -178,15 +253,19 @@ export default function Dashboard() {
     fetchCategories()
     handleModalClose()
  main
+ main
   }
 
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString('en-GB')
   }
 
+ feat_members-ui/30-09-2025
+
  feat_reports-ui/30-09-2025
 
 
+ main
  main
  main
   if (loading) {
@@ -204,6 +283,15 @@ export default function Dashboard() {
       <div className="row">
         <div className="col-12">
           <div className="d-flex justify-content-between align-items-center mb-4">
+ feat_members-ui/30-09-2025
+            <h2><i className="fas fa-users me-2"></i>Members Management</h2>
+            <button 
+              className="btn btn-primary" 
+              onClick={() => setShowModal(true)}
+            >
+              <i className="fas fa-plus me-1"></i>Add Member
+            </button>
+
  feat_reports-ui/30-09-2025
             <h2><i className="fas fa-chart-bar me-2"></i>Reports</h2>
             <div className="btn-group">
@@ -228,9 +316,12 @@ export default function Dashboard() {
             <span className="badge bg-primary fs-6">Total Members: {totalMembers}</span>
  main
  main
+ main
           </div>
         </div>
       </div>
+
+ feat_members-ui/30-09-2025
 
  feat_reports-ui/30-09-2025
       {/* Report Filters */}
@@ -331,6 +422,7 @@ export default function Dashboard() {
               </div>
 
  feat_categories-ui/30-09-2025
+ main
       {/* Search and Filter */}
       <div className="row mb-4">
         <div className="col-12">
@@ -343,14 +435,22 @@ export default function Dashboard() {
                     <input 
                       type="text" 
                       className="form-control" 
+ feat_members-ui/30-09-2025
+                      placeholder="Search members by name, email, or phone..." 
+
                       placeholder="Search categories by name or description..." 
+ main
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
                     />
                   </div>
                 </div>
                 <div className="col-md-4">
+ feat_members-ui/30-09-2025
+                  <button type="submit" className="btn btn-outline-primary me-2">
+
                   <button type="submit" className="btn btn-outline-warning me-2">
+ main
                     <i className="fas fa-search me-1"></i>Search
                   </button>
                   <button 
@@ -365,6 +465,8 @@ export default function Dashboard() {
                   </button>
                 </div>
               </form>
+ feat_members-ui/30-09-2025
+
 
       <div className="row">
         {/* Statistics Cards */}
@@ -422,10 +524,14 @@ export default function Dashboard() {
               </div>
  main
  main
+ main
             </div>
           </div>
         </div>
       </div>
+
+ feat_members-ui/30-09-2025
+      {/* Members Table */}
 
  feat_reports-ui/30-09-2025
       {/* Report Data */}
@@ -433,10 +539,28 @@ export default function Dashboard() {
  feat_categories-ui/30-09-2025
       {/* Categories Table */}
  main
+ main
       <div className="row">
         <div className="col-12">
           <div className="card">
             <div className="card-header">
+ feat_members-ui/30-09-2025
+              <h5 className="mb-0"><i className="fas fa-list me-2"></i>Members List</h5>
+            </div>
+            <div className="card-body">
+              {members.length > 0 ? (
+                <>
+                  <div className="table-responsive">
+                    <table className="table table-hover">
+                      <thead className="table-primary">
+                        <tr>
+                          <th>Name</th>
+                          <th>Email</th>
+                          <th>Phone</th>
+                          <th>Category</th>
+                          <th>Address</th>
+                          <th>Created</th>
+
  feat_reports-ui/30-09-2025
               <h5 className="mb-0"><i className="fas fa-table me-2"></i>Members Report</h5>
             </div>
@@ -530,10 +654,32 @@ export default function Dashboard() {
                           <th>Description</th>
                           <th>Created</th>
                           <th>Updated</th>
+ main
                           <th>Actions</th>
                         </tr>
                       </thead>
                       <tbody>
+ feat_members-ui/30-09-2025
+                        {members.map((member) => (
+                          <tr key={member.id}>
+                            <td>
+                              <div className="d-flex align-items-center">
+                                <div className="avatar me-2">
+                                  <i className="fas fa-user-circle fa-2x text-primary"></i>
+                                </div>
+                                <div>
+                                  <strong>{member.name}</strong>
+                                </div>
+                              </div>
+                            </td>
+                            <td>{member.email}</td>
+                            <td>{member.phone}</td>
+                            <td>
+                              <span className="badge bg-warning">{member.category_name}</span>
+                            </td>
+                            <td>{member.address}</td>
+                            <td>{formatDate(member.created_at)}</td>
+
                         {categories.map((category) => (
                           <tr key={category.id}>
                             <td>
@@ -549,6 +695,7 @@ export default function Dashboard() {
                             <td>{category.description}</td>
                             <td>{formatDate(category.created_at)}</td>
                             <td>{formatDate(category.updated_at)}</td>
+ main
                             <td>
                               <div className="btn-group" role="group">
                                 <button className="btn btn-sm btn-outline-primary">
@@ -556,13 +703,21 @@ export default function Dashboard() {
                                 </button>
                                 <button 
                                   className="btn btn-sm btn-outline-warning"
+ feat_members-ui/30-09-2025
+                                  onClick={() => handleEdit(member)}
+
                                   onClick={() => handleEdit(category)}
+ main
                                 >
                                   <i className="fas fa-edit"></i>
                                 </button>
                                 <button 
                                   className="btn btn-sm btn-outline-danger"
+ feat_members-ui/30-09-2025
+                                  onClick={() => handleDelete(member.id, member.name)}
+
                                   onClick={() => handleDelete(category.id, category.name)}
+ main
                                 >
                                   <i className="fas fa-trash"></i>
                                 </button>
@@ -576,7 +731,11 @@ export default function Dashboard() {
 
                   {/* Pagination */}
                   {totalPages > 1 && (
+ feat_members-ui/30-09-2025
+                    <nav aria-label="Members pagination">
+
                     <nav aria-label="Categories pagination">
+ main
                       <ul className="pagination justify-content-center">
                         {currentPage > 1 && (
                           <li className="page-item">
@@ -616,6 +775,19 @@ export default function Dashboard() {
                 </>
               ) : (
                 <div className="text-center py-5">
+ feat_members-ui/30-09-2025
+                  <i className="fas fa-users fa-4x text-muted mb-3"></i>
+                  <h5 className="text-muted">No members found</h5>
+                  <p className="text-muted">Start by adding your first member!</p>
+                  <button 
+                    className="btn btn-primary" 
+                    onClick={() => setShowModal(true)}
+                  >
+                    <i className="fas fa-plus me-1"></i>Add Member
+                  </button>
+                </div>
+              )}
+
                   <i className="fas fa-tags fa-4x text-muted mb-3"></i>
                   <h5 className="text-muted">No categories found</h5>
                   <p className="text-muted">Start by adding your first category!</p>
@@ -660,10 +832,22 @@ export default function Dashboard() {
                 </div>
               </div>
  main
+ main
             </div>
           </div>
         </div>
       </div>
+ feat_members-ui/30-09-2025
+
+      {/* Member Modal */}
+      <MemberModal
+        show={showModal}
+        onHide={handleModalClose}
+        onSave={handleMemberSave}
+        member={editingMember}
+        categories={categories}
+      />
+
  feat_categories-ui/30-09-2025
 
       {/* Category Modal */}
@@ -674,6 +858,7 @@ export default function Dashboard() {
         category={editingCategory}
       />
 
+ main
  main
  main
     </div>
