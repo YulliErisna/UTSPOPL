@@ -8,6 +8,7 @@ export default function Reports() {
   const [period, setPeriod] = useState('month')
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
+  const [exportLoading, setExportLoading] = useState(false)
 
   useEffect(() => {
     updateDateRange()
@@ -72,16 +73,46 @@ export default function Reports() {
     fetchReports()
   }
 
-  const exportToPDF = () => {
-    alert('PDF export feature will be implemented with Puppeteer!')
+  const exportToPDF = async () => {
+    setExportLoading(true)
+    try {
+      const response = await fetch('/api/reports/export-pdf', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          period,
+          start_date: startDate,
+          end_date: endDate
+        })
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        // Open PDF in new window
+        const printWindow = window.open('', '_blank')
+        printWindow.document.write(data.html)
+        printWindow.document.close()
+        
+        // Auto print dialog
+        setTimeout(() => {
+          printWindow.print()
+        }, 250)
+      } else {
+        alert('Failed to generate PDF')
+      }
+    } catch (error) {
+      console.error('Error exporting PDF:', error)
+      alert('Failed to export PDF')
+    } finally {
+      setExportLoading(false)
+    }
   }
 
   const printReport = () => {
     window.print()
-  }
-
-  const exportToExcel = () => {
-    alert('Excel export feature coming soon!')
   }
 
   const formatDate = (date) => {
@@ -105,10 +136,27 @@ export default function Reports() {
           <div className="d-flex justify-content-between align-items-center mb-4">
             <h2><i className="fas fa-chart-bar me-2"></i>Reports</h2>
             <div className="btn-group">
-              <button className="btn btn-success" onClick={exportToPDF}>
-                <i className="fas fa-file-pdf me-1"></i>Export PDF
+              <button 
+                className="btn btn-success" 
+                onClick={exportToPDF}
+                disabled={exportLoading || members.length === 0}
+              >
+                {exportLoading ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm me-1"></span>
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-file-pdf me-1"></i>Export PDF
+                  </>
+                )}
               </button>
-              <button className="btn btn-info" onClick={printReport}>
+              <button 
+                className="btn btn-info" 
+                onClick={printReport}
+                disabled={members.length === 0}
+              >
                 <i className="fas fa-print me-1"></i>Print
               </button>
             </div>
@@ -200,8 +248,8 @@ export default function Reports() {
                 <div className="col-md-3">
                   <div className="p-3">
                     <i className="fas fa-clock fa-3x text-info mb-3"></i>
-                    <h4>{new Date().toLocaleString()}</h4>
-                    <p className="text-muted">Generated At</p>
+                    <h4>{new Date().toLocaleDateString()}</h4>
+                    <p className="text-muted">Generated Date</p>
                   </div>
                 </div>
                 <div className="col-md-3">
@@ -285,14 +333,24 @@ export default function Reports() {
               <div className="card-body text-center">
                 <h5 className="mb-3">Export Options</h5>
                 <div className="btn-group" role="group">
-                  <button className="btn btn-success" onClick={exportToPDF}>
-                    <i className="fas fa-file-pdf me-1"></i>Export as PDF
+                  <button 
+                    className="btn btn-success" 
+                    onClick={exportToPDF}
+                    disabled={exportLoading}
+                  >
+                    {exportLoading ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm me-1"></span>
+                        Generating PDF...
+                      </>
+                    ) : (
+                      <>
+                        <i className="fas fa-file-pdf me-1"></i>Export as PDF
+                      </>
+                    )}
                   </button>
                   <button className="btn btn-info" onClick={printReport}>
                     <i className="fas fa-print me-1"></i>Print Report
-                  </button>
-                  <button className="btn btn-primary" onClick={exportToExcel}>
-                    <i className="fas fa-file-excel me-1"></i>Export as Excel
                   </button>
                 </div>
               </div>

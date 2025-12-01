@@ -39,3 +39,41 @@ INSERT INTO members (name, email, phone, address, category_id) VALUES
 ('Alice Brown', 'alice@example.com', '081234567893', 'Jl. Gatot Subroto No. 321', 3),
 ('Charlie Wilson', 'charlie@example.com', '081234567894', 'Jl. HR Rasuna Said No. 654', 4);
 
+-- Tambahkan tabel users untuk login
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    role ENUM('admin', 'user') DEFAULT 'user',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Insert default admin user (password: admin123)
+-- Password di-hash menggunakan SHA-256
+INSERT INTO users (username, password, name, email, role) VALUES
+('admin', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Administrator', 'admin@membership.com', 'admin'),
+('user', 'ee0b0df4a336b68b106cef1c9df84650ae02c35194ad03ab9e004c4bb43d604f', 'Regular User', 'user@membership.com', 'user');
+
+-- Tambahkan tabel sessions untuk menyimpan session
+CREATE TABLE IF NOT EXISTS sessions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    token VARCHAR(255) UNIQUE NOT NULL,
+    expires_at DATETIME NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Tambahkan tabel activity_logs untuk tracking aktivitas
+CREATE TABLE IF NOT EXISTS activity_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    action VARCHAR(100) NOT NULL,
+    description TEXT,
+    ip_address VARCHAR(45),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);

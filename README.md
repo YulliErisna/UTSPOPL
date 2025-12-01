@@ -58,6 +58,9 @@ A comprehensive web application built with Next.js and MySQL for managing member
    ```bash
    npm install
    ```
+      ```bash
+   npm install bcryptjs
+   ```
 
 3. Update database configuration in `lib/db.js` if needed:
    ```javascript
