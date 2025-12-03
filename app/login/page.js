@@ -138,7 +138,7 @@ export default function LoginPage() {
             <div className="text-center mt-3">
               <p className="text-white">
                 <i className="fas fa-copyright me-1"></i>
-                2024 Membership Management System
+                2025 Membership Management System
               </p>
             </div>
           </div>
