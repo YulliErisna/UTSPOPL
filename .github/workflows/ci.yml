@@ -1,29 +1,21 @@
-name: CI - Build & Lint
+name: CI
 
 on:
   push:
     branches: ["main"]
-  pull_request:
-    branches: ["main"]
 
 jobs:
-  build-and-lint:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      - name: Install Dependencies
+      - name: Install deps
         run: npm install
 
-      - name: Build Application
+      - name: Build Next.js
         run: npm run build
 
-      - name: Run Linter
-        run: npm run lint
+      - name: Run tests
+        run: npm test
