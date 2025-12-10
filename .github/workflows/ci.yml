@@ -1,21 +1,51 @@
-name: CI
+name: Next.js CI
 
 on:
   push:
-    branches: ["main"]
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   build:
+    name: Build Next.js Project
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      # 1. Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Install deps
+      # 2. Setup Node.js (Next.js rekomendasi Node v18+)
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: "npm"
+
+      # 3. Install dependencies
+      - name: Install dependencies
         run: npm install
 
+      # 4. Build Next.js
+        # Jangan pakai test supaya tidak error Missing test script
       - name: Build Next.js
         run: npm run build
 
-      - name: Run tests
-        run: npm test
+      # 5. Export (optional untuk static build)
+      # Kalau kamu tidak pakai next export, boleh hapus bagian ini
+      - name: Export static site (optional)
+        if: ${{ always() }}
+        run: |
+          if npm run | grep -q "export"; then
+            npm run export
+          else
+            echo "No export script, skipping..."
+          fi
+
+      # 6. Upload artifacts (hasil build) → optional
+      - name: Upload production artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: next-build
+          path: .next
